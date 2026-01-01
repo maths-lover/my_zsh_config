@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZSH Configuration Complete Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --text-color: #2c3e50;
+            --code-bg: #282c34;
+            --code-text: #abb2bf;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .version {
+            margin-left: auto;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Mobile menu toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+
+        /* Sidebar */
+        aside {
+            position: fixed;
+            left: 0;
+            top: var(--header-height);
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: white;
+            overflow-y: auto;
+            padding: 2rem 0;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        aside nav a {
+            display: block;
+            padding: 0.5rem 2rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        aside nav a:hover {
+            background: var(--bg-color);
+            border-left-color: var(--secondary-color);
+        }
+
+        aside nav a.active {
+            background: var(--bg-color);
+            border-left-color: var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        aside nav a.level-2 {
+            padding-left: 2.5rem;
+            font-size: 0.9rem;
+        }
+
+        aside nav a.level-3 {
+            padding-left: 3rem;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* Main content */
+        main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 3rem;
+            max-width: 1200px;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            scroll-margin-top: calc(var(--header-height) + 2rem);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+        }
+
+        h4 {
+            font-size: 1.2rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        code {
+            background: #e9ecef;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--code-text);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: var(--bg-color);
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        /* Links */
+        a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Scroll to top button */
+        #scroll-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        #scroll-top:hover {
+            background: #c0392b;
+            transform: translateY(-3px);
+        }
+
+        #scroll-top.visible {
+            display: flex;
+        }
+
+        /* Search box */
+        .search-box {
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        /* Highlight search results */
+        .highlight {
+            background: yellow;
+            padding: 0.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            aside {
+                transform: translateX(-100%);
+            }
+
+            aside.open {
+                transform: translateX(0);
+            }
+
+            main {
+                margin-left: 0;
+                padding: 2rem 1rem;
+            }
+
+            header h1 {
+                font-size: 1.2rem;
+            }
+
+            .version {
+                display: none;
+            }
+
+            #scroll-top {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            aside, header, #scroll-top {
+                display: none;
+            }
+
+            main {
+                margin-left: 0;
+                margin-top: 0;
+            }
+        }
+
+        /* Syntax highlighting colors */
+        .comment { color: #5c6370; }
+        .keyword { color: #c678dd; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+        .function { color: #61afef; }
+    </style>
+</head>
+<body>
+    <header>
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <h1>ZSH Configuration Complete Guide</h1>
+        <span class="version">v1.0</span>
+    </header>
+
+    <aside id="sidebar">
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Search..." onkeyup="searchContent()">
+        </div>
+        <nav id="nav">
+            <!-- Navigation will be generated by JavaScript -->
+        </nav>
+    </aside>
+
+    <main id="content">
+        <section id="quick-start">
+            <h1>Quick Start</h1>
+            <p>Essential commands for daily use:</p>
+            
+            <h3>Navigation</h3>
+            <pre><code>z myproject          # Jump to frequent directory
+zi                   # Interactive directory selection
+..                   # Go up one level
+up 3                 # Go up 3 levels</code></pre>
+
+            <h3>Search</h3>
+            <pre><code>Ctrl+R               # Search command history
+Ctrl+T               # Find files
+Ctrl+G               # Search code content
+fzgrep "TODO"        # Interactive code search</code></pre>
+
+            <h3>Files</h3>
+            <pre><code>fopen                # Interactive file open
+ll                   # List files with details
+cat file.txt         # View file (with syntax highlighting)</code></pre>
+
+            <h3>Git</h3>
+            <pre><code>gs                   # git status
+gaa                  # git add --all
+gcm "message"        # git commit -m "message"
+gp                   # git push
+gl                   # git log (pretty)</code></pre>
+        </section>
+
+        <section id="aliases-reference">
+            <h1>Aliases Reference</h1>
+
+            <h2 id="general-aliases">General Aliases</h2>
+            
+            <h3 id="directory-listing">Directory Listing</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alias</th>
+                        <th>Command</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>ls</code></td><td>eza/exa/ls --color</td><td>Basic list</td></tr>
+                    <tr><td><code>ll</code></td><td>Long format</td><td>List with details</td></tr>
+                    <tr><td><code>la</code></td><td>List all</td><td>Including hidden files</td></tr>
+                    <tr><td><code>lt</code></td><td>Tree view</td><td>2 levels deep</td></tr>
+                    <tr><td><code>l</code></td><td>Single column</td><td>One file per line</td></tr>
+                </tbody>
+            </table>
+
+            <h3 id="navigation-aliases">Navigation</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alias</th>
+                        <th>Command</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>..</code></td><td>cd ..</td><td>Go up one level</td></tr>
+                    <tr><td><code>...</code></td><td>cd ../..</td><td>Go up two levels</td></tr>
+                    <tr><td><code>....</code></td><td>cd ../../..</td><td>Go up three levels</td></tr>
+                    <tr><td><code>.....</code></td><td>cd ../../../..</td><td>Go up four levels</td></tr>
+                    <tr><td><code>-</code></td><td>cd -</td><td>Previous directory</td></tr>
+                </tbody>
+            </table>
+
+            <h3 id="zoxide-aliases">Zoxide (Smart Navigation)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alias</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>z project</code></td><td>Jump to most frequent match</td></tr>
+                    <tr><td><code>zi</code></td><td>Interactive selection with fzf</td></tr>
+                    <tr><td><code>zz</code></td><td>Go to previous directory</td></tr>
+                    <tr><td><code>zh</code></td><td>Go to home directory</td></tr>
+                    <tr><td><code>zq</code></td><td>Query zoxide database</td></tr>
+                    <tr><td><code>zr path</code></td><td>Remove path from database</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="git-aliases">Git Aliases</h2>
+            <p>Comprehensive git shortcuts for efficient workflow:</p>
+
+            <h3 id="git-status">Status & Info</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alias</th>
+                        <th>Command</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>g</code></td><td>git</td><td>Git shortcut</td></tr>
+                    <tr><td><code>gs</code></td><td>git status</td><td>Show status</td></tr>
+                    <tr><td><code>gss</code></td><td>git status --short</td><td>Short status</td></tr>
+                    <tr><td><code>gsb</code></td><td>git status --short --branch</td><td>Short with branch</td></tr>
+                </tbody>
+            </table>
+
+            <h3 id="git-commit">Committing</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alias</th>
+                        <th>Command</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>gc</code></td><td>git commit --verbose</td><td>Commit with diff</td></tr>
+                    <tr><td><code>gc!</code></td><td>git commit --amend</td><td>Amend last commit</td></tr>
+                    <tr><td><code>gcn!</code></td><td>git commit --amend --no-edit</td><td>Amend without message change</td></tr>
+                    <tr><td><code>gcm "msg"</code></td><td>git commit -m</td><td>Quick commit</td></tr>
+                    <tr><td><code>gca</code></td><td>git commit --all</td><td>Commit all changes</td></tr>
+                </tbody>
+            </table>
+
+            <h3 id="git-branching">Branches</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alias</th>
+                        <th>Command</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>gb</code></td><td>git branch</td><td>List branches</td></tr>
+                    <tr><td><code>gba</code></td><td>git branch --all</td><td>All branches</td></tr>
+                    <tr><td><code>gbd</code></td><td>git branch --delete</td><td>Delete branch</td></tr>
+                    <tr><td><code>gcb</code></td><td>git checkout -b</td><td>Create & checkout</td></tr>
+                </tbody>
+            </table>
+
+            <h3 id="git-log">Log & History</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alias</th>
+                        <th>Command</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>gl</code></td><td>git log --oneline --graph</td><td>Simple log</td></tr>
+                    <tr><td><code>gla</code></td><td>git log --oneline --graph --all</td><td>All branches</td></tr>
+                    <tr><td><code>glg</code></td><td>git log (pretty)</td><td>Colored log</td></tr>
+                </tbody>
+            </table>
+
+            <h3 id="git-push-pull">Push & Pull</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alias</th>
+                        <th>Command</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>gp</code></td><td>git push</td><td>Push to remote</td></tr>
+                    <tr><td><code>gpl</code></td><td>git pull</td><td>Pull from remote</td></tr>
+                    <tr><td><code>gpr</code></td><td>git pull --rebase</td><td>Pull with rebase</td></tr>
+                    <tr><td><code>gpf</code></td><td>git push --force-with-lease</td><td>Safe force push</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="functions-reference">
+            <h1>Functions Reference</h1>
+
+            <h2 id="archive-management">Archive Management</h2>
+            
+            <h3 id="lsarchive">lsarchive - List Archive Contents</h3>
+            <pre><code># Syntax
+lsarchive &lt;archive-file&gt;
+
+# Examples
+lsarchive backup.tar.gz
+lsarchive file.zip
+lsarchive data.7z</code></pre>
+
+            <h3 id="unarchive">unarchive - Extract Archives</h3>
+            <pre><code># Syntax
+unarchive &lt;archive-file&gt; [destination]
+
+# Examples
+unarchive backup.tar.gz                    # Extract here
+unarchive backup.zip /tmp/extracted        # Extract to path</code></pre>
+
+            <h3 id="archive">archive - Create Archives</h3>
+            <pre><code># Syntax
+archive &lt;archive-name&gt; &lt;files/directories...&gt;
+
+# Examples
+archive backup.tar.gz myproject/           # gzip
+archive backup.tar.xz myproject/           # xz (best compression)
+archive backup.zip myproject/              # zip format</code></pre>
+
+            <h2 id="directory-navigation">Directory Navigation</h2>
+
+            <h3 id="mkcd">mkcd - Create and Enter Directory</h3>
+            <pre><code># Syntax
+mkcd &lt;directory&gt;
+
+# Example
+mkcd ~/projects/new-app</code></pre>
+
+            <h3 id="up">up - Go Up N Directories</h3>
+            <pre><code># Syntax
+up [N]
+
+# Examples
+up           # Go up 1 level
+up 3         # Go up 3 levels</code></pre>
+
+            <h2 id="fzf-interactive-functions">FZF Interactive Functions</h2>
+
+            <h3 id="fcd">fcd - Interactive Directory Change</h3>
+            <pre><code># Usage
+fcd
+# Shows all directories
+# Navigate with arrows
+# Press Enter to cd</code></pre>
+
+            <h3 id="fopen">fopen - Interactive File Open</h3>
+            <pre><code># Usage
+fopen
+# Shows all files with preview
+# Press Enter to open in editor</code></pre>
+
+            <h3 id="fzgrep">fzgrep - Interactive Code Search</h3>
+            <pre><code># Syntax
+fzgrep &lt;pattern&gt; [path]
+
+# Examples
+fzgrep "TODO"
+fzgrep "function.*handle"
+fzgrep "import" ~/project</code></pre>
+
+            <h3 id="fkill">fkill - Interactive Process Kill</h3>
+            <pre><code># Usage
+fkill [signal]
+# Select process with Tab
+# Press Enter to kill</code></pre>
+
+            <h3 id="fgb">fgb - Interactive Git Branch</h3>
+            <pre><code># Usage
+fgb
+# Shows all branches
+# Select to checkout</code></pre>
+        </section>
+
+        <section id="keybindings-reference">
+            <h1>Keybindings Reference</h1>
+
+            <h2 id="main-keybindings">Main FZF Keybindings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Function</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>Ctrl+R</code></td><td>History search</td><td>Search and execute commands</td></tr>
+                    <tr><td><code>Ctrl+T</code></td><td>File finder</td><td>Find files and insert path</td></tr>
+                    <tr><td><code>Alt+C</code></td><td>Directory change</td><td>Interactive navigation</td></tr>
+                    <tr><td><code>Ctrl+G</code></td><td>Code search</td><td>Search code with fzgrep</td></tr>
+                    <tr><td><code>Alt+F</code></td><td>File open</td><td>Open file in editor</td></tr>
+                </tbody>
+            </table>
+
+            <h2 id="fzf-controls">Inside FZF Interface</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>↑ ↓</code></td><td>Navigate results</td></tr>
+                    <tr><td><code>Enter</code></td><td>Select/Execute</td></tr>
+                    <tr><td><code>Esc</code></td><td>Cancel/Exit</td></tr>
+                    <tr><td><code>Tab</code></td><td>Mark multiple</td></tr>
+                    <tr><td><code>Ctrl+/</code></td><td>Toggle preview</td></tr>
+                    <tr><td><code>Ctrl+U/D</code></td><td>Scroll preview</td></tr>
+                    <tr><td><code>Ctrl+A</code></td><td>Select all</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="customization-guide">
+            <h1>Customization Guide</h1>
+
+            <h2 id="adding-custom-aliases">Adding Custom Aliases</h2>
+            <p><strong>File:</strong> <code>~/.config/zsh/aliases.zsh</code></p>
+            <pre><code># Open the file
+aliases
+
+# Add your custom aliases
+alias deployapp='ssh user@server "cd /var/www && git pull"'
+alias logs='cd /var/log && ls -lhrt'
+
+# Save and reload
+zshreload</code></pre>
+
+            <h2 id="creating-custom-functions">Creating Custom Functions</h2>
+            <p><strong>File:</strong> <code>~/.config/zsh/functions.zsh</code></p>
+            <pre><code># Simple function
+mycommit() {
+    git add -A
+    git commit -m "$*"
+    git push origin main
+}
+
+# Function with error checking
+bedit() {
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: bedit &lt;file&gt;"
+        return 1
+    fi
+    
+    local file="$1"
+    
+    # Create backup
+    cp "$file" "${file}.backup.$(date +%Y%m%d_%H%M%S)"
+    
+    # Edit file
+    ${EDITOR:-vim} "$file"
+}</code></pre>
+
+            <h2 id="modifying-keybindings">Modifying Keybindings</h2>
+            <p><strong>File:</strong> <code>~/.config/zsh/fzf.zsh</code></p>
+            <pre><code># Simple command binding
+bindkey -s '^X^G' 'git status\n'
+
+# Insert text without executing
+bindkey -s '^X^D' 'docker ps -a'
+
+# Change existing keybinding
+# Find: bindkey -s '^G' 'fzgrep '
+# Change to: bindkey -s '^G' 'git status\n'</code></pre>
+
+            <h2 id="environment-variables">Environment Variables</h2>
+            <p><strong>File:</strong> <code>~/.config/zsh/environment.zsh</code></p>
+            <pre><code># Change default editor
+export EDITOR='code'
+export VISUAL="$EDITOR"
+
+# Add to PATH
+export PATH="$HOME/.local/mybin:$PATH"
+
+# Configure FZF
+export FZF_DEFAULT_OPTS="
+    --height=60%
+    --layout=reverse
+    --border=rounded
+"
+
+# Zoxide settings
+export _ZO_ECHO=1
+export _ZO_EXCLUDE_DIRS="$HOME/Downloads"</code></pre>
+
+            <h2 id="plugin-management">Plugin Management</h2>
+            <p><strong>File:</strong> <code>~/.config/zsh/plugins.zsh</code></p>
+            <pre><code># Installing new plugin
+cd ~/.config/zsh/plugins
+git clone https://github.com/user/plugin-name
+
+# Edit plugins.zsh
+vim ~/.config/zsh/plugins.zsh
+
+# Add loading code
+if [[ -d "${PLUGIN_DIR}/plugin-name" ]]; then
+    source "${PLUGIN_DIR}/plugin-name/plugin-name.plugin.zsh"
+fi
+
+# Reload
+zshreload</code></pre>
+        </section>
+
+        <section id="configuration-files">
+            <h1>Configuration Files Explained</h1>
+            <pre><code>~/.config/zsh/
+├── .zshrc              # Main entry point
+├── environment.zsh     # PATH, env vars
+├── aliases.zsh         # All aliases
+├── functions.zsh       # Custom functions
+├── completion.zsh      # Tab completion
+├── plugins.zsh         # Plugin management
+├── ssh-agent.zsh       # SSH agent
+├── fzf.zsh            # FZF integrations
+└── plugins/           # Plugin directory</code></pre>
+
+            <h2>Load Order</h2>
+            <ol>
+                <li><strong>environment.zsh</strong> - PATH and environment variables</li>
+                <li><strong>ssh-agent.zsh</strong> - SSH agent initialization</li>
+                <li><strong>aliases.zsh</strong> - All aliases</li>
+                <li><strong>functions.zsh</strong> - Custom functions</li>
+                <li><strong>completion.zsh</strong> - Completion system</li>
+                <li><strong>fzf.zsh</strong> - FZF integrations</li>
+                <li><strong>plugins.zsh</strong> - Plugins (near end)</li>
+                <li><strong>starship</strong> - Prompt (last)</li>
+            </ol>
+        </section>
+
+        <section id="tips-tricks">
+            <h1>Tips & Tricks</h1>
+
+            <h2>Command Chaining</h2>
+            <pre><code># Run if previous succeeds
+command1 && command2
+
+# Run regardless
+command1; command2
+
+# Run if previous fails
+command1 || command2</code></pre>
+
+            <h2>Brace Expansion</h2>
+            <pre><code># Create multiple files
+touch file{1,2,3}.txt
+
+# Create nested directories
+mkdir -p project/{src,tests,docs}
+
+# Backup file
+cp important.txt{,.backup}</code></pre>
+
+            <h2>History Tricks</h2>
+            <pre><code>!!           # Repeat last command
+!$           # Last argument
+!^           # First argument
+!*           # All arguments
+!git         # Last git command
+^old^new^    # Replace in last command</code></pre>
+
+            <h2>Job Control</h2>
+            <pre><code>command &        # Run in background
+Ctrl+Z          # Suspend current job
+bg              # Resume in background
+fg              # Bring to foreground
+jobs            # List background jobs</code></pre>
+        </section>
+
+        <section id="troubleshooting">
+            <h1>Troubleshooting</h1>
+
+            <h2>Command Not Found</h2>
+            <pre><code># Check if installed
+which command_name
+
+# Check PATH
+echo $PATH
+
+# Add to PATH temporarily
+export PATH="/path/to/bin:$PATH"</code></pre>
+
+            <h2>Slow Shell Startup</h2>
+            <pre><code># Profile startup
+zmodload zsh/zprof
+source ~/.zshrc
+zprof
+
+# Clear completion cache
+rm ~/.config/zsh/.zcompdump*
+
+# Restart SSH agent
+ssh-restart</code></pre>
+
+            <h2>Completion Not Working</h2>
+            <pre><code># Rebuild cache
+rm ~/.config/zsh/.zcompdump*
+autoload -U compinit && compinit
+
+# Reload
+zshreload</code></pre>
+
+            <h2>Reset Everything</h2>
+            <pre><code># Backup current config
+cp -r ~/.config/zsh ~/.config/zsh.backup.$(date +%Y%m%d)
+
+# Start fresh
+rm -rf ~/.config/zsh
+# Then reinstall</code></pre>
+        </section>
+    </main>
+
+    <button id="scroll-top" onclick="scrollToTop()">↑</button>
+
+    <script>
+        // Generate navigation from headings
+        function generateNav() {
+            const content = document.getElementById('content');
+            const nav = document.getElementById('nav');
+            const headings = content.querySelectorAll('h1, h2, h3');
+            
+            headings.forEach((heading, index) => {
+                const id = heading.id || `heading-${index}`;
+                heading.id = id;
+                
+                const link = document.createElement('a');
+                link.href = `#${id}`;
+                link.textContent = heading.textContent;
+                link.className = `level-${heading.tagName[1]}`;
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    scrollToElement(id);
+                    if (window.innerWidth <= 768) {
+                        toggleMenu();
+                    }
+                };
+                
+                nav.appendChild(link);
+            });
+        }
+
+        // Smooth scroll to element
+        function scrollToElement(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                updateActiveNav(id);
+            }
+        }
+
+        // Update active navigation item
+        function updateActiveNav(activeId) {
+            const links = document.querySelectorAll('aside nav a');
+            links.forEach(link => {
+                if (link.href.endsWith(`#${activeId}`)) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Show/hide scroll to top button
+        window.onscroll = function() {
+            const scrollBtn = document.getElementById('scroll-top');
+            if (document.documentElement.scrollTop > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+
+            // Update active nav on scroll
+            updateActiveNavOnScroll();
+        };
+
+        // Update active nav based on scroll position
+        function updateActiveNavOnScroll() {
+            const headings = document.querySelectorAll('h1[id], h2[id], h3[id]');
+            let current = '';
+
+            headings.forEach(heading => {
+                const rect = heading.getBoundingClientRect();
+                if (rect.top <= 100) {
+                    current = heading.id;
+                }
+            });
+
+            if (current) {
+                updateActiveNav(current);
+            }
+        }
+
+        // Toggle mobile menu
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Search functionality
+        function searchContent() {
+            const input = document.getElementById('search');
+            const filter = input.value.toLowerCase();
+            const nav = document.getElementById('nav');
+            const links = nav.getElementsByTagName('a');
+
+            for (let i = 0; i < links.length; i++) {
+                const txtValue = links[i].textContent || links[i].innerText;
+                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                    links[i].style.display = '';
+                } else {
+                    links[i].style.display = 'none';
+                }
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            generateNav();
+            
+            // Handle hash in URL
+            if (window.location.hash) {
+                const id = window.location.hash.substring(1);
+                setTimeout(() => scrollToElement(id), 100);
+            }
+        });
+
+        // Handle browser back/forward
+        window.addEventListener('hashchange', function() {
+            if (window.location.hash) {
+                const id = window.location.hash.substring(1);
+                scrollToElement(id);
+            }
+        });
+    </script>
+</body>
+</html>
