@@ -98,6 +98,9 @@ source_if_exists "${ZDOTDIR}/completion.zsh"
 # Load fzf integrations
 source_if_exists "${ZDOTDIR}/fzf.zsh"
 
+# load some other utils
+source_if_exists "${ZDOTDIR}/utils.zsh"
+
 # Load plugins (must be near the end)
 source_if_exists "${ZDOTDIR}/plugins.zsh"
 

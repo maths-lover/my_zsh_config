@@ -101,8 +101,8 @@ read_only_style = ''
 "Downloads" = " "
 "Music" = "󰝚 "
 "Pictures" = " "
-"Developer" = "󰲋 "
-"dev" = "󰲋 "
+"Develop" = "󰲋 "
+"develop" = "󰲋 "
 
 [git_branch]
 format = '[─](fg:current_line)[](fg:cyan)[$symbol](fg:primary bg:cyan)[](fg:cyan bg:box)[ $branch](fg:foreground bg:box)[](fg:box bg:yellow)'

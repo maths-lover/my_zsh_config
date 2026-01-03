@@ -15,7 +15,7 @@ export PAGER='bat'
 # ============================================================================
 # Google chrome
 # ============================================================================
-export CHROME_EXECUTABLE="google-chrome-stable"
+#export CHROME_EXECUTABLE="google-chrome-stable"
 
 # ============================================================================
 # PATH Configuration
@@ -47,7 +47,7 @@ path_append "/usr/local/go/bin"
 path_append "$HOME/.local/share/python/bin"
 
 # Flutter
-path_append "$HOME/dev/sdks/flutter/bin"
+path_append "$HOME/Develop/toolkit/SDKs/flutter/bin"
 
 # ============================================================================
 # Tool Configuration
@@ -99,6 +99,12 @@ export LESS_TERMCAP_ue=$'\e[0m'         # reset underline
 
 # Python
 export PYTHONDONTWRITEBYTECODE=1
+function python_enable() {
+	eval "$(pyenv init -)"
+	if which pyenv-virtualenv-init > /dev/null; then
+		eval "$(pyenv virtualenv-init -)" &;
+	fi
+}
 
 # Go
 export GOPATH="${HOME}/dev/go"
