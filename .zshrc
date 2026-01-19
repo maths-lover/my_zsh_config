@@ -107,6 +107,11 @@ source_if_exists "${ZDOTDIR}/plugins.zsh"
 # Initialize starship prompt (must be at the end)
 eval "$(starship init zsh)"
 
+# run fastfetch for no reason
+if command -v fastfetch &>/dev/null; then
+  fastfetch
+fi
+
 # ============================================================================
 # Performance Profiling (uncomment to see startup times)
 # ============================================================================
