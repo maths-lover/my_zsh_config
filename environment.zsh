@@ -138,6 +138,26 @@ export MYSQL_HISTFILE="${XDG_DATA_HOME}/mysql_history"
 export SQLITE_HISTORY="${XDG_DATA_HOME}/sqlite_history"
 
 # ============================================================================
+# colima and docker stuff
+# ============================================================================
+export DOCKER_HOST="unix:///var/run/docker.sock"
+
+# ============================================================================
+# Homebrew
+# ============================================================================
+if [ -z /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+fi
+
+
+# ============================================================================
+# Added by Antigravity
+# ============================================================================
+if [ -d "$HOME/.antigravity" ]; then
+  export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+fi
+
+# ============================================================================
 # Zoxide Configuration
 # ============================================================================
 if command -v zoxide &>/dev/null; then
@@ -145,15 +165,15 @@ if command -v zoxide &>/dev/null; then
 
     # Optional: Set zoxide data directory to XDG location
     export _ZO_DATA_DIR="${XDG_DATA_HOME}/zoxide"
-    
+
     # Optional: Configure zoxide behavior
     # export _ZO_ECHO=1              # Print matched directory before navigating
     # export _ZO_EXCLUDE_DIRS=""     # Colon-separated list of dirs to exclude
     export _ZO_FZF_OPTS="
         --height=50%
-	--border=rounded
-	--preview='ls -lah {}'
-	--preview-window='right:60%'
+        --border=rounded
+        --preview='ls -lah {}'
+        --preview-window='right:60%'
     " # Custom fzf options for zoxide
     # export _ZO_MAXAGE=10000        # Maximum age of entries in database
     # export _ZO_RESOLVE_SYMLINKS=0  # Don't resolve symlinks
