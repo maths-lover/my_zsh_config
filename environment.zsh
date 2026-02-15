@@ -148,7 +148,7 @@ export DOCKER_HOST="unix:///var/run/docker.sock"
 if [ -z /opt/homebrew/bin/brew ]; then
   eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 fi
-
+export HOMEBREW_NO_ENV_HINTS=1
 
 # ============================================================================
 # Added by Antigravity
