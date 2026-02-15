@@ -135,7 +135,7 @@ info "Checking CLI tools"
 # Use "-" to skip a package manager (handled via fallback below)
 TOOLS=(
     "bat:bat:bat:bat:bat"
-    "eza:eza:-:eza:eza"
+    "eza:eza:-:-:eza"
     "fd:fd:fd-find:fd-find:fd"
     "fzf:fzf:fzf:fzf:fzf"
     "rg:ripgrep:ripgrep:ripgrep:ripgrep"
@@ -182,6 +182,25 @@ install_eza_apt() {
     sudo apt-get install -y eza
 }
 
+install_eza_binary() {
+    if command -v eza >/dev/null 2>&1; then
+        ok "eza already installed"
+        return
+    fi
+    info "Installing eza from GitHub release"
+    local tmp
+    tmp="$(mktemp -d)"
+    local release_url="https://github.com/eza-community/eza/releases/latest/download/eza_${ARCH}-unknown-linux-gnu.tar.gz"
+    curl -fsSL "${release_url}" -o "${tmp}/eza.tar.gz" || {
+        warn "Could not download eza binary — skipping"
+        rm -rf "${tmp}"
+        return
+    }
+    tar xzf "${tmp}/eza.tar.gz" -C "${tmp}"
+    sudo install -m 755 "${tmp}/eza" /usr/local/bin/eza
+    rm -rf "${tmp}"
+}
+
 install_fastfetch_apt() {
     if command -v fastfetch >/dev/null 2>&1; then
         ok "fastfetch already installed"
@@ -217,7 +236,7 @@ for entry in "${TOOLS[@]}"; do
                 if [[ "${PKG}" == "apt" ]]; then
                     install_eza_apt
                 elif [[ "${PKG}" == "dnf" ]]; then
-                    install_pkg eza
+                    install_eza_binary
                 else
                     warn "No known method to install eza on ${PKG} — skipping"
                 fi
