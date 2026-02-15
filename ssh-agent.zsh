@@ -1,49 +1,35 @@
 #!/usr/bin/env zsh
 # ============================================================================
-# SSH Agent Configuration
+# SSH Agent Configuration (macOS)
+# ============================================================================
+# On macOS, launchd manages ssh-agent automatically.
+# Combined with UseKeychain + AddKeysToAgent in ~/.ssh/config,
+# passphrases are stored in the system Keychain and keys are
+# added to the agent on first use — no manual ssh-add needed.
 # ============================================================================
 
-# SSH agent environment file
-SSH_ENV="${HOME}/.ssh/agent.env"
+# Add keys to the macOS Keychain agent on first shell session.
+# --apple-use-keychain stores the passphrase in the Keychain so
+# subsequent uses won't prompt for a password.
+if [[ "$(uname)" == "Darwin" ]]; then
+    # Only add if no identities are loaded yet
+    if ! ssh-add -l &>/dev/null; then
+        ssh-add --apple-load-keychain 2>/dev/null
 
-# Function to start SSH agent
-start_ssh_agent() {
-    echo "Starting new SSH agent..."
-    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    chmod 600 "${SSH_ENV}"
-    source "${SSH_ENV}" > /dev/null
-    
-    # Automatically add default SSH keys if they exist
-    local default_keys=(
-        "${HOME}/.ssh/id_rsa"
-        "${HOME}/.ssh/id_ed25519"
-        "${HOME}/.ssh/id_ecdsa"
-    )
-    
-    for key in "${default_keys[@]}"; do
-        if [[ -f "${key}" ]]; then
-            ssh-add "${key}" 2>/dev/null
+        # If nothing in keychain yet, add default keys with keychain storage
+        if ! ssh-add -l &>/dev/null; then
+            local default_keys=(
+                "${HOME}/.ssh/id_ed25519"
+                "${HOME}/.ssh/id_rsa"
+                "${HOME}/.ssh/id_ecdsa"
+            )
+            for key in "${default_keys[@]}"; do
+                if [[ -f "${key}" ]]; then
+                    ssh-add --apple-use-keychain "${key}" 2>/dev/null
+                fi
+            done
         fi
-    done
-}
-
-# Function to check if SSH agent is running
-is_ssh_agent_running() {
-    [[ -n "${SSH_AGENT_PID}" ]] && ps -p "${SSH_AGENT_PID}" > /dev/null 2>&1
-}
-
-# ============================================================================
-# Main SSH Agent Logic
-# ============================================================================
-
-# Check if SSH agent environment file exists and source it
-if [[ -f "${SSH_ENV}" ]]; then
-    source "${SSH_ENV}" > /dev/null
-fi
-
-# If agent is not running or the PID is invalid, start a new one
-if ! is_ssh_agent_running; then
-    start_ssh_agent
+    fi
 fi
 
 # ============================================================================
@@ -55,20 +41,24 @@ ssh-keys() {
     ssh-add -l
 }
 
-# Add SSH key
+# Add SSH key (with Keychain storage on macOS)
 ssh-add-key() {
     if [[ $# -eq 0 ]]; then
         echo "Usage: ssh-add-key <path-to-key>"
-        echo "Example: ssh-add-key ~/.ssh/id_rsa"
+        echo "Example: ssh-add-key ~/.ssh/id_ed25519"
         return 1
     fi
-    
+
     if [[ ! -f "$1" ]]; then
         echo "Error: Key file not found: $1"
         return 1
     fi
-    
-    ssh-add "$1"
+
+    if [[ "$(uname)" == "Darwin" ]]; then
+        ssh-add --apple-use-keychain "$1"
+    else
+        ssh-add "$1"
+    fi
 }
 
 # Remove all SSH keys from agent
@@ -76,42 +66,3 @@ ssh-clear() {
     ssh-add -D
     echo "All SSH keys removed from agent"
 }
-
-# Restart SSH agent
-ssh-restart() {
-    # Kill existing agent if running
-    if is_ssh_agent_running; then
-        echo "Stopping existing SSH agent (PID: ${SSH_AGENT_PID})..."
-        kill "${SSH_AGENT_PID}" 2>/dev/null
-    fi
-    
-    # Remove old environment file
-    [[ -f "${SSH_ENV}" ]] && rm "${SSH_ENV}"
-    
-    # Start new agent
-    start_ssh_agent
-}
-
-# ============================================================================
-# SSH Agent Forwarding (for remote sessions)
-# ============================================================================
-
-# Enable SSH agent forwarding for remote sessions
-# This is useful when you SSH into a remote machine and want to use your local SSH keys
-# Add this to your ~/.ssh/config:
-#   Host *
-#       ForwardAgent yes
-
-# ============================================================================
-# Optional: Keychain Integration
-# ============================================================================
-
-# If you prefer using keychain instead of manual SSH agent management,
-# uncomment the following section and install keychain:
-#   - Ubuntu/Debian: sudo apt install keychain
-#   - Fedora/RHEL:   sudo dnf install keychain
-#   - macOS:         brew install keychain
-
-# if command -v keychain &>/dev/null; then
-#     eval $(keychain --eval --quiet id_rsa id_ed25519)
-# fi
