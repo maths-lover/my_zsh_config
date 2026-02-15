@@ -145,8 +145,12 @@ export DOCKER_HOST="unix:///var/run/docker.sock"
 # ============================================================================
 # Homebrew
 # ============================================================================
-if [ -z /opt/homebrew/bin/brew ]; then
+if [[ -f /opt/homebrew/bin/brew ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+elif [[ -f /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv zsh)"
+elif [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
 fi
 export HOMEBREW_NO_ENV_HINTS=1
 

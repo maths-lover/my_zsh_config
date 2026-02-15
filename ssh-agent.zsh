@@ -1,11 +1,12 @@
 #!/usr/bin/env zsh
 # ============================================================================
-# SSH Agent Configuration (macOS)
+# SSH Agent Configuration (macOS + Linux)
 # ============================================================================
-# On macOS, launchd manages ssh-agent automatically.
-# Combined with UseKeychain + AddKeysToAgent in ~/.ssh/config,
-# passphrases are stored in the system Keychain and keys are
-# added to the agent on first use — no manual ssh-add needed.
+# macOS: launchd manages ssh-agent automatically. Combined with
+#   UseKeychain + AddKeysToAgent in ~/.ssh/config, passphrases are
+#   stored in the system Keychain and keys are added on first use.
+# Linux: A persistent agent is managed via ~/.ssh/agent.env so all
+#   terminal sessions share a single ssh-agent process.
 # ============================================================================
 
 # Add keys to the macOS Keychain agent on first shell session.
@@ -29,6 +30,21 @@ if [[ "$(uname)" == "Darwin" ]]; then
                 fi
             done
         fi
+    fi
+else
+    # Linux: manage ssh-agent manually via environment file
+    local agent_env="${HOME}/.ssh/agent.env"
+
+    if [[ -f "${agent_env}" ]]; then
+        source "${agent_env}" >/dev/null
+    fi
+
+    # Start a new agent if the current one is dead or unset
+    if ! ssh-add -l &>/dev/null 2>&1; then
+        eval "$(ssh-agent -s)" >/dev/null
+        echo "SSH_AUTH_SOCK=${SSH_AUTH_SOCK}; export SSH_AUTH_SOCK;" > "${agent_env}"
+        echo "SSH_AGENT_PID=${SSH_AGENT_PID}; export SSH_AGENT_PID;" >> "${agent_env}"
+        chmod 600 "${agent_env}"
     fi
 fi
 
