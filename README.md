@@ -5,7 +5,7 @@ Cross-platform ZSH configuration with a bootstrap script that works on macOS (Ap
 ## Setup
 
 ```bash
-git clone git@github.com:maths-lover/my_zsh_config.git ~/.config/zsh && bash ~/.config/zsh/setup_zsh.sh
+git clone git@github.com:maths-lover/zsh_config.git ~/.config/zsh && bash ~/.config/zsh/setup_zsh.sh
 ```
 
 The setup script will:
