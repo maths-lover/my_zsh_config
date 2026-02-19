@@ -107,7 +107,7 @@ function python_enable() {
 }
 
 # Go
-export GOPATH="${HOME}/dev/go"
+export GOPATH="${HOME}/Develop/go"
 export GOBIN="${GOPATH}/bin"
 path_append "${GOBIN}"
 
